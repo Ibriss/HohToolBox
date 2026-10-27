@@ -1,6 +1,6 @@
 {
-  "name": "Uni Hohenheim – Meine Tools",
-  "short_name": "Uni-Tools",
+  "name": "HohToolBox",
+  "short_name": "HohToolBox",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
