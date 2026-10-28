@@ -9,6 +9,17 @@
 <meta name="theme-color" content="#101319" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script>
+(function(){var K="hohtoolbox-theme",C={light:"#f4f5f7",dark:"#101319"};
+function get(){try{return localStorage.getItem(K)||"auto"}catch(e){return"auto"}}
+function apply(m){var r=document.documentElement,h=document.head;
+ if(m==="light"||m==="dark")r.setAttribute("data-theme",m);else r.removeAttribute("data-theme");
+ [].slice.call(h.querySelectorAll('meta[name="theme-color"]')).forEach(function(e){e.parentNode.removeChild(e)});
+ function add(c,med){var e=document.createElement("meta");e.name="theme-color";e.content=c;if(med)e.media=med;h.appendChild(e)}
+ if(m==="light"||m==="dark")add(C[m]);else{add(C.light,"(prefers-color-scheme: light)");add(C.dark,"(prefers-color-scheme: dark)")}}
+window.hohTheme={get:get,set:function(m){try{if(m==="auto")localStorage.removeItem(K);else localStorage.setItem(K,m)}catch(e){}apply(m)}};
+apply(get());})();
+</script>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#14181f;--muted:#5d6675;--accent:#0b6b3a;--border:#e1e4ea;--danger:#c0392b;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}

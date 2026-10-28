@@ -9,6 +9,17 @@
 <meta name="theme-color" content="#101319" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script>
+(function(){var K="hohtoolbox-theme",C={light:"#f4f5f7",dark:"#101319"};
+function get(){try{return localStorage.getItem(K)||"auto"}catch(e){return"auto"}}
+function apply(m){var r=document.documentElement,h=document.head;
+ if(m==="light"||m==="dark")r.setAttribute("data-theme",m);else r.removeAttribute("data-theme");
+ [].slice.call(h.querySelectorAll('meta[name="theme-color"]')).forEach(function(e){e.parentNode.removeChild(e)});
+ function add(c,med){var e=document.createElement("meta");e.name="theme-color";e.content=c;if(med)e.media=med;h.appendChild(e)}
+ if(m==="light"||m==="dark")add(C[m]);else{add(C.light,"(prefers-color-scheme: light)");add(C.dark,"(prefers-color-scheme: dark)")}}
+window.hohTheme={get:get,set:function(m){try{if(m==="auto")localStorage.removeItem(K);else localStorage.setItem(K,m)}catch(e){}apply(m)}};
+apply(get());})();
+</script>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#14181f;--muted:#5d6675;--accent:#0b6b3a;--border:#e1e4ea;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -35,6 +46,9 @@ h2{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut
 .row .ic{font-size:1.3rem}
 .row small{display:block;color:var(--muted);font-size:.8rem}
 footer{margin-top:28px;color:var(--muted);font-size:.8rem;text-align:center}
+.theme{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.theme button{font:inherit;font-size:.8rem;background:var(--card);color:var(--muted);border:0;padding:8px 14px;cursor:pointer}
+.theme button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:600}
 </style>
 </head>
 <body>
@@ -60,7 +74,7 @@ footer{margin-top:28px;color:var(--muted);font-size:.8rem;text-align:center}
 <div class="grid" id="core"></div>
 <h2>Weitere Links</h2>
 <div class="list" id="more"></div>
-<footer>Tipp: In Chrome Menü ⋮ → „Zum Startbildschirm hinzufügen“</footer>
+<footer><div class="theme" role="group" aria-label="Darstellung"><button type="button" data-m="auto">Auto</button><button type="button" data-m="light">Hell</button><button type="button" data-m="dark">Dunkel</button></div><br>Tipp: In Chrome Menü ⋮ → „Zum Startbildschirm hinzufügen“</footer>
 </main>
 <script>
 // Hier Links anpassen: [Icon, Name, Beschreibung, URL]
@@ -87,6 +101,10 @@ document.getElementById("core").innerHTML=CORE.map(function(t){
 return '<a class="tile" href="'+t[3]+'"'+tg(t[3])+'><span class="ic">'+t[0]+'</span><b>'+esc(t[1])+'</b><span class="d">'+esc(t[2])+'</span></a>'}).join("");
 document.getElementById("more").innerHTML=MORE.map(function(t){
 return '<a class="row" href="'+t[3]+'"'+tg(t[3])+'><span class="ic">'+t[0]+'</span><div><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></div></a>'}).join("");
+var tb=document.querySelectorAll(".theme button");
+function markTheme(){var m=hohTheme.get();for(var i=0;i<tb.length;i++)tb[i].setAttribute("aria-pressed",tb[i].getAttribute("data-m")===m?"true":"false")}
+for(var i=0;i<tb.length;i++)tb[i].onclick=function(){hohTheme.set(this.getAttribute("data-m"));markTheme()};
+markTheme();
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
 </body>
