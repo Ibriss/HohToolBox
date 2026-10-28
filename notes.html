@@ -72,6 +72,7 @@ function renderList(){
   :'<div class="empty">'+(q?"Nichts gefunden.":"Noch keine Notizen. Tippe auf „+ Neu“.")+'</div>';
 }
 function route(){
+ if(location.hash==="#new"){location.replace("#n-"+mk().id);return}
  var h=location.hash.slice(1),n=h.indexOf("n-")===0?find(h.slice(2)):null;
  if(cur&&cur!==n)flush();
  if(n){cur=n;$("vList").hidden=true;$("vEdit").hidden=false;$("title").value=n.title;$("text").value=n.text;$("st").textContent="";if(!n.title&&!n.text)$("title").focus()}
@@ -90,7 +91,8 @@ function touch(){
  clearTimeout(timer);
  timer=setTimeout(function(){$("st").textContent=save()?"Gespeichert":"Speichern fehlgeschlagen (Speicher voll oder blockiert)"},300);
 }
-$("new").onclick=function(){var n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:"",text:"",updated:Date.now()};notes.push(n);location.hash="n-"+n.id};
+function mk(){var n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:"",text:"",updated:Date.now()};notes.push(n);return n}
+$("new").onclick=function(){location.hash="n-"+mk().id};
 $("list").onclick=function(e){var b=e.target.closest(".item");if(b)location.hash="n-"+b.getAttribute("data-id")};
 $("q").oninput=renderList;
 $("title").oninput=touch;$("text").oninput=touch;
