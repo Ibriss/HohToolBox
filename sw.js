@@ -1,5 +1,5 @@
-const CACHE = "hohtoolbox-v3";
-const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const CACHE = "hohtoolbox-v4";
+const FILES = ["./", "./index.html", "./notes.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
   self.skipWaiting();

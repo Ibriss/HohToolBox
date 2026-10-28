@@ -68,7 +68,8 @@ var CORE=[
 ["📚","ILIAS","Kursmaterial & Lernplattform","https://ilias.uni-hohenheim.de/login.php?client_id=UHOH&lang=de"],
 ["🧩","F.I.T.","Weiterbildungsplattform","https://weiterbildung.uni-hohenheim.de"],
 ["🔎","HohSearch","Bibliothekskatalog","https://rds-hoh.ibs-bw.de/hohsearch/"],
-["🤖","GPTalk","Uni-interner KI-Chat","https://gptalk.uni-hohenheim.de/"]
+["🤖","GPTalk","Uni-interner KI-Chat","https://gptalk.uni-hohenheim.de/"],
+["📝","Notizen","Eigene Notizen, auch offline","notes.html"]
 ];
 var MORE=[
 ["🍽️","Mensa Hohenheim","Speiseplan","https://www.my-stuwe.de/mensa/mensa-hohenheim/"],
@@ -79,11 +80,12 @@ var MORE=[
 ["🗂️","Studienplan","Studienunterlagen","https://www.uni-hohenheim.de/studienplan"],
 ["🛟","KIM IT-Hilfe","Anleitungen, VPN, eduroam","https://kim.uni-hohenheim.de"]
 ];
+function tg(u){return /^https?:/.test(u)?' target="_blank" rel="noopener"':""}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 document.getElementById("core").innerHTML=CORE.map(function(t){
-return '<a class="tile" href="'+t[3]+'" target="_blank" rel="noopener"><span class="ic">'+t[0]+'</span><b>'+esc(t[1])+'</b><span class="d">'+esc(t[2])+'</span></a>'}).join("");
+return '<a class="tile" href="'+t[3]+'"'+tg(t[3])+'><span class="ic">'+t[0]+'</span><b>'+esc(t[1])+'</b><span class="d">'+esc(t[2])+'</span></a>'}).join("");
 document.getElementById("more").innerHTML=MORE.map(function(t){
-return '<a class="row" href="'+t[3]+'" target="_blank" rel="noopener"><span class="ic">'+t[0]+'</span><div><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></div></a>'}).join("");
+return '<a class="row" href="'+t[3]+'"'+tg(t[3])+'><span class="ic">'+t[0]+'</span><div><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></div></a>'}).join("");
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
 </body>
