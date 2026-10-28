@@ -49,6 +49,25 @@ footer{margin-top:28px;color:var(--muted);font-size:.8rem;text-align:center}
 .theme{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
 .theme button{font:inherit;font-size:.8rem;background:var(--card);color:var(--muted);border:0;padding:8px 14px;cursor:pointer}
 .theme button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:600}
+.fr{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:flex-start;margin-bottom:12px}
+.fr .theme{margin-bottom:0}
+.btn{font:inherit;font-size:.85rem;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600}
+.disc{margin:0 0 6px;line-height:1.4}
+#toasts{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:10px;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none;z-index:50}
+.toast{pointer-events:auto;width:100%;max-width:536px;margin:0 auto;background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.toast b{display:block;margin-bottom:2px}
+.toast p{margin:0 0 12px;font-size:.88rem;color:var(--muted);line-height:1.4}
+.toast .acts{display:flex;gap:8px;justify-content:flex-end}
+dialog{width:min(520px,calc(100% - 24px));max-height:calc(100% - 48px);padding:0;border:1px solid var(--border);border-radius:18px;background:var(--card);color:var(--text);overflow:hidden}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dlg{padding:18px 18px 20px;overflow-y:auto;max-height:calc(100vh - 60px);max-height:calc(100dvh - 60px)}
+.dlg h3{font-size:1rem;margin:20px 0 6px}
+.dlg h3:first-of-type{margin-top:0}
+.dlg p{margin:0 0 8px;font-size:.9rem;line-height:1.5;color:var(--muted)}
+.dlg .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.dlg .top h2{margin:0;font-size:1.2rem;letter-spacing:0;text-transform:none;color:var(--text)}
+.dlg code{color:var(--text);user-select:all;word-break:break-all}
 </style>
 </head>
 <body>
@@ -74,8 +93,28 @@ footer{margin-top:28px;color:var(--muted);font-size:.8rem;text-align:center}
 <div class="grid" id="core"></div>
 <h2>Weitere Links</h2>
 <div class="list" id="more"></div>
-<footer><div class="theme" role="group" aria-label="Darstellung"><button type="button" data-m="auto">Auto</button><button type="button" data-m="light">Hell</button><button type="button" data-m="dark">Dunkel</button></div><br>Tipp: In Chrome Menü ⋮ → „Zum Startbildschirm hinzufügen“</footer>
+<footer>
+<div class="fr"><div class="theme" role="group" aria-label="Darstellung"><button type="button" data-m="auto">Auto</button><button type="button" data-m="light">Hell</button><button type="button" data-m="dark">Dunkel</button></div><button type="button" class="btn" id="infoBtn">Info &amp; Feedback</button></div>
+<p class="disc">Inoffizielles Projekt eines Studierenden – nicht mit der Universität Hohenheim verbunden.</p>
+<div id="ver"></div>
+</footer>
 </main>
+<div id="toasts" aria-live="polite"></div>
+<dialog id="info" aria-labelledby="infoTitle"><div class="dlg">
+<div class="top"><h2 id="infoTitle">Info &amp; Feedback</h2><button type="button" class="btn" id="infoClose">Schließen</button></div>
+<h3>Über HohToolBox</h3>
+<p>Ein privates Hobbyprojekt eines Studierenden. Es steht in keiner Verbindung zur Universität Hohenheim und wird weder von ihr betrieben noch unterstützt oder geprüft. Die verlinkten Dienste gehören ihren jeweiligen Betreibern. Alle Angaben ohne Gewähr.</p>
+<h3>Als App installieren</h3>
+<div id="instBody"></div>
+<h3>Feedback</h3>
+<p>Fehler, Ideen oder fehlende Links? Schreib mir kurz.</p>
+<p><button type="button" class="btn p" id="mailBtn">Feedback per E-Mail</button></p>
+<p>Falls sich kein Mailprogramm öffnet: <code id="mailTxt"></code></p>
+<h3>Datenschutz</h3>
+<p>Die App nutzt kein Tracking und sammelt keine Daten. Notizen und Einstellungen liegen nur lokal in deinem Browser (Notizen bei Bedarf unter „Notizen → Exportieren“ sichern). Beim Aufruf sieht der Hosting-Anbieter technisch bedingt Verbindungsdaten wie die IP-Adresse.</p>
+<h3>Version</h3>
+<p id="ver2"></p>
+</div></dialog>
 <script>
 // Hier Links anpassen: [Icon, Name, Beschreibung, URL]
 var CORE=[
@@ -105,7 +144,88 @@ var tb=document.querySelectorAll(".theme button");
 function markTheme(){var m=hohTheme.get();for(var i=0;i<tb.length;i++)tb[i].setAttribute("aria-pressed",tb[i].getAttribute("data-m")===m?"true":"false")}
 for(var i=0;i<tb.length;i++)tb[i].onclick=function(){hohTheme.set(this.getAttribute("data-m"));markTheme()};
 markTheme();
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+/* ---------- Version, Hilfsfunktionen ---------- */
+// Bei jedem Update hier UND in sw.js (CACHE) hochzählen.
+var VERSION="1.1.0";
+function $(i){return document.getElementById(i)}
+$("ver").textContent="Version "+VERSION;$("ver2").textContent="Version "+VERSION;
+function toast(id,title,text,acts){
+ var old=$(id);if(old)old.parentNode.removeChild(old);
+ var d=document.createElement("div");d.className="toast";d.id=id;d.setAttribute("role","status");
+ d.innerHTML='<b></b><p></p><div class="acts"></div>';
+ d.querySelector("b").textContent=title;d.querySelector("p").textContent=text;
+ var a=d.querySelector(".acts");
+ acts.forEach(function(x){var b=document.createElement("button");b.type="button";b.className="btn"+(x[2]?" p":"");b.textContent=x[0];b.onclick=x[1];a.appendChild(b)});
+ $("toasts").appendChild(d);
+}
+function drop(id){var e=$(id);if(e)e.parentNode.removeChild(e)}
+
+/* ---------- Installationshilfe (einmalig) ---------- */
+var IK="hohtoolbox-install-seen",dp=null;
+function seen(){try{return localStorage.getItem(IK)==="1"}catch(e){return false}}
+function mark(){try{localStorage.setItem(IK,"1")}catch(e){}}
+var standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var iosText="Tippe im Browser auf das Teilen-Symbol (Quadrat mit Pfeil nach oben) und wähle „Zum Home-Bildschirm“.";
+var andText="Chrome: Menü ⋮ → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.";
+function doInstall(){
+ if(!dp)return;var p=dp;dp=null;p.prompt();
+ p.userChoice.then(function(){mark();drop("tInstall");renderInstall()}).catch(function(){});
+}
+function renderInstall(){
+ var h=$("instBody");h.innerHTML="";
+ var p=document.createElement("p");h.appendChild(p);
+ if(standalone){p.textContent="Die App ist bereits installiert. ✓";return}
+ if(dp){
+  p.textContent="Als App auf den Startbildschirm legen – schneller Zugriff, läuft auch offline.";
+  var b=document.createElement("button");b.type="button";b.className="btn p";b.textContent="App installieren";b.onclick=doInstall;
+  var w=document.createElement("p");w.appendChild(b);h.appendChild(w);
+ }else p.textContent=ios?iosText:andText;
+}
+window.addEventListener("beforeinstallprompt",function(e){
+ e.preventDefault();dp=e;renderInstall();
+ if(!standalone&&!seen())toast("tInstall","App installieren","Auf den Startbildschirm legen – schneller Zugriff, läuft auch offline.",
+  [["Nicht jetzt",function(){mark();drop("tInstall")}],["Installieren",doInstall,true]]);
+});
+window.addEventListener("appinstalled",function(){mark();standalone=true;dp=null;drop("tInstall");renderInstall()});
+if(ios&&!standalone&&!seen())setTimeout(function(){
+ toast("tInstall","Als App installieren",iosText,[["Verstanden",function(){mark();drop("tInstall")},true]]);
+},1200);
+
+/* ---------- Info & Feedback ---------- */
+var MAIL=["Josefvangessel","gmail.com"].join("@");
+$("mailTxt").textContent=MAIL;
+$("mailBtn").onclick=function(){
+ location.href="mailto:"+MAIL+"?subject="+encodeURIComponent("HohToolBox Feedback (v"+VERSION+")")+
+  "&body="+encodeURIComponent("Hallo Josef,\n\n\n\n—\nHohToolBox v"+VERSION);
+};
+$("infoBtn").onclick=function(){renderInstall();$("info").showModal()};
+$("infoClose").onclick=function(){$("info").close()};
+$("info").addEventListener("click",function(e){if(e.target===this)this.close()});
+renderInstall();
+
+/* ---------- Service Worker & Update-Hinweis ---------- */
+if("serviceWorker" in navigator){
+ var hadCtrl=!!navigator.serviceWorker.controller,reloading=false;
+ function showUpdate(w){
+  toast("tUpdate","Neue Version verfügbar","Tippe auf „Neu laden“, um die aktuelle Version zu nutzen.",
+   [["Später",function(){drop("tUpdate")}],["Neu laden",function(){w.postMessage({type:"SKIP_WAITING"})},true]]);
+ }
+ navigator.serviceWorker.addEventListener("controllerchange",function(){
+  if(!hadCtrl){hadCtrl=true;return}   // erste Installation: kein Reload nötig
+  if(reloading)return;reloading=true;location.reload();
+ });
+ window.addEventListener("load",function(){
+  navigator.serviceWorker.register("sw.js").then(function(reg){
+   if(reg.waiting&&navigator.serviceWorker.controller)showUpdate(reg.waiting);
+   reg.addEventListener("updatefound",function(){
+    var w=reg.installing;if(!w)return;
+    w.addEventListener("statechange",function(){if(w.state==="installed"&&navigator.serviceWorker.controller)showUpdate(w)});
+   });
+   document.addEventListener("visibilitychange",function(){if(!document.hidden)reg.update().catch(function(){})});
+  }).catch(function(){});
+ });
+}
 </script>
 </body>
 </html>
