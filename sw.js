@@ -1,4 +1,4 @@
-const CACHE = "hohtoolbox-v7";
+const CACHE = "hohtoolbox-v9";
 const FILES = ["./", "./index.html", "./notes.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 // Kein skipWaiting() hier: Ein neuer Worker wartet, bis der Nutzer im Update-Banner "Neu laden" tippt.

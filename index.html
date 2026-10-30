@@ -67,6 +67,8 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .dlg p{margin:0 0 8px;font-size:.9rem;line-height:1.5;color:var(--muted)}
 .dlg .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .dlg .top h2{margin:0;font-size:1.2rem;letter-spacing:0;text-transform:none;color:var(--text)}
+.dlg a{color:var(--accent)}
+a.btn{display:inline-block;text-decoration:none}
 .dlg code{color:var(--text);user-select:all;word-break:break-all}
 </style>
 </head>
@@ -104,12 +106,12 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 <div class="top"><h2 id="infoTitle">Info &amp; Feedback</h2><button type="button" class="btn" id="infoClose">Schließen</button></div>
 <h3>Über HohToolBox</h3>
 <p>Ein privates Hobbyprojekt eines Studierenden. Es steht in keiner Verbindung zur Universität Hohenheim und wird weder von ihr betrieben noch unterstützt oder geprüft. Die verlinkten Dienste gehören ihren jeweiligen Betreibern. Alle Angaben ohne Gewähr.</p>
+<p>Gebaut von Ibris · <a href="https://github.com/Ibriss" target="_blank" rel="noopener">GitHub-Profil</a> · <a href="https://github.com/Ibriss/HohToolBox" target="_blank" rel="noopener">Quellcode</a></p>
 <h3>Als App installieren</h3>
 <div id="instBody"></div>
 <h3>Feedback</h3>
-<p>Fehler, Ideen oder fehlende Links? Schreib mir kurz.</p>
-<p><button type="button" class="btn p" id="mailBtn">Feedback per E-Mail</button></p>
-<p>Falls sich kein Mailprogramm öffnet: <code id="mailTxt"></code></p>
+<p>Fehler, Ideen oder fehlende Links? Melde sie als Issue auf GitHub (dafür brauchst du einen kostenlosen GitHub-Account).</p>
+<p><a class="btn p" id="issueBtn" href="https://github.com/Ibriss/HohToolBox/issues" target="_blank" rel="noopener">Auf GitHub melden</a></p>
 <h3>Datenschutz</h3>
 <p>Die App nutzt kein Tracking und sammelt keine Daten. Notizen und Einstellungen liegen nur lokal in deinem Browser (Notizen bei Bedarf unter „Notizen → Exportieren“ sichern). Beim Aufruf sieht der Hosting-Anbieter technisch bedingt Verbindungsdaten wie die IP-Adresse.</p>
 <h3>Version</h3>
@@ -146,7 +148,7 @@ for(var i=0;i<tb.length;i++)tb[i].onclick=function(){hohTheme.set(this.getAttrib
 markTheme();
 /* ---------- Version, Hilfsfunktionen ---------- */
 // Bei jedem Update hier UND in sw.js (CACHE) hochzählen.
-var VERSION="1.1.0";
+var VERSION="1.1.2";
 function $(i){return document.getElementById(i)}
 $("ver").textContent="Version "+VERSION;$("ver2").textContent="Version "+VERSION;
 function toast(id,title,text,acts){
@@ -193,12 +195,8 @@ if(ios&&!standalone&&!seen())setTimeout(function(){
 },1200);
 
 /* ---------- Info & Feedback ---------- */
-var MAIL=["Josefvangessel","gmail.com"].join("@");
-$("mailTxt").textContent=MAIL;
-$("mailBtn").onclick=function(){
- location.href="mailto:"+MAIL+"?subject="+encodeURIComponent("HohToolBox Feedback (v"+VERSION+")")+
-  "&body="+encodeURIComponent("Hallo Josef,\n\n\n\n—\nHohToolBox v"+VERSION);
-};
+$("issueBtn").href="https://github.com/Ibriss/HohToolBox/issues/new?title="+encodeURIComponent("Feedback")+
+ "&body="+encodeURIComponent("HohToolBox v"+VERSION+"\n\n");
 $("infoBtn").onclick=function(){renderInstall();$("info").showModal()};
 $("infoClose").onclick=function(){$("info").close()};
 $("info").addEventListener("click",function(e){if(e.target===this)this.close()});
